@@ -1,7 +1,6 @@
 # Deno AoC2024
+
 Advent of code 2024 [^1] with Deno [^2][^3]
-
-
 
 > [!NOTE]
 > 👨🏻‍💻 In Progress
@@ -15,5 +14,7 @@ Advent of code 2024 [^1] with Deno [^2][^3]
 ```
 
 [^1]: [Official Site](https://adventofcode.com/2024)
+
 [^2]: [Deno](https://docs.deno.com/)
+
 [^3]: [Deno - Advent of code](https://deno.com/blog/advent-of-code-2024)

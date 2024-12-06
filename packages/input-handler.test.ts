@@ -1,6 +1,6 @@
-import { assertEquals } from "@std/assert";
 import { getInput } from "./input-handler.ts";
+import { assertThrows } from "@std/assert";
 
-Deno.test(function getInputTest() {
-  assertEquals(add(2, 3), 5);
+Deno.test("Throw error when input directory not provided", () => {
+	assertThrows(() => getInput(undefined));
 });
