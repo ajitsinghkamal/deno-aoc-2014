@@ -38,7 +38,7 @@ function traverseLists(
 	return traverseLists(
 		leftList,
 		rightList,
-		Math.abs((rightYield.value ?? 0) - (rightYield.value ?? 0)),
+		totalDistance + Math.abs((rightYield.value ?? 0) - (rightYield.value ?? 0)),
 	);
 }
 
