@@ -2,6 +2,7 @@
 	"tasks": {
 		"solve": "deno run --env --allow-env --allow-read",
 		"dev": "deno run --env --allow-env --allow-read --watch problems/**/*.ts",
+		"tests": "deno test --allow-env --allow-read --env-file='.env.test'",
 		"lint": "deno lint",
 		"format": "deno fmt"
 	},

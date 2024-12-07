@@ -1,4 +1,4 @@
-import type { Maybe } from "./type-utils.ts";
+import type { Maybe } from "../type_utils.ts";
 
 const defaultInputFileName = Deno.env.get(
 	"DEFAULT_INPUT_FILE_NAME",
@@ -32,6 +32,7 @@ export function getInput(
 		throw new Error("No input directory provided to get the solution!");
 	}
 	const path = `${dir}/${config?.fileName ?? defaultInputFileName}`;
+
 	const fileText = Deno.readTextFileSync(path);
 
 	if (config?.afterRead) {

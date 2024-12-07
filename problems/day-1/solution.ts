@@ -2,7 +2,7 @@
  * @author Ajit
  * https://adventofcode.com/2024/day/1
  */
-import { getInput } from "../../packages/input-handler.ts";
+import { getInput } from "../../packages/input_handler/mod.ts";
 
 function retrieveLists(input: string[]) {
 	const leftList: number[] = [];
