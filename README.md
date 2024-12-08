@@ -16,6 +16,12 @@ Advent of code 2024 [^1] with Deno [^2][^3]
 deno task main --day=<DAY_ID>
 ```
 
+If the problem for that day had multiple parts you can run only specific part by using `--part` argument
+
+```
+deno task main --day=<DAY_ID> --part=2
+```
+
 You can also directly run the problem solution
 
 ```
