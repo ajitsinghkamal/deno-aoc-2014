@@ -1,11 +1,44 @@
+import { getInput } from "../../packages/input_handler/mod.ts";
+import { logModExecution } from "../../packages/logger.ts";
+import { getCliArgs } from "../../packages/cli.ts";
+import { splitInListByWhitespace } from "../../packages/utilities/string.ts";
+import type { Result } from "../types.ts";
+
 /**
  * @author Ajit
  * https://adventofcode.com/2024/day/1
+ * @param {number} solvePart - Day 1 problem has 2 parts. Use this param to get the result of only a specific part.
+ * 1: solve for only part 1
+ * 2: solve for only part 2
+ * ?: When not specified or undefined, solve for both parts in order.
+ *
+ * @returns Array of results for each part or Specific result if param solvePart was specified
  */
-import { getInput } from "../../packages/input_handler/mod.ts";
-import { logModExecution } from "../../packages/logger/mod.ts";
-import { splitInListByWhitespace } from "../../packages/utilities/string.ts";
-import type { Result } from "../types.ts";
+export function main(solvePart?: number): Result | Result[] {
+	const input = getInput(import.meta.dirname);
+	const { leftList, rightList } = retrieveLists(input);
+	const sortedLeftList = getSortedListInAscOrder(leftList);
+	const sortedRightList = getSortedListInAscOrder(rightList);
+
+	if (solvePart === 1) {
+		return findTotalDistanceBetweenLists(sortedLeftList, sortedRightList);
+	}
+
+	if (solvePart === 2) {
+		return findSimilarityScoreBetweenLists(sortedLeftList, sortedRightList);
+	}
+
+	return [
+		findTotalDistanceBetweenLists(sortedLeftList, sortedRightList),
+		findSimilarityScoreBetweenLists(sortedLeftList, sortedRightList),
+	];
+}
+
+if (import.meta.main) {
+	const { part } = getCliArgs();
+	const result = main(part);
+	logModExecution(result, import.meta.dirname);
+}
 
 function retrieveLists(input: string[]) {
 	const leftList: number[] = [];
@@ -21,9 +54,12 @@ function retrieveLists(input: string[]) {
 	};
 }
 
-function* generateSortedListInAscOrder(list: number[]) {
-	const sorted = list.sort((num1, num2) => num1 - num2);
-	yield* sorted;
+function getSortedListInAscOrder(list: number[]) {
+	return list.sort((num1, num2) => num1 - num2);
+}
+
+function* makeListGenerator(list: number[]) {
+	yield* list;
 }
 
 function traverseLists(
@@ -44,20 +80,38 @@ function traverseLists(
 	);
 }
 
-export function main(): Result {
-	const input = getInput(import.meta.dirname);
-	const { leftList, rightList } = retrieveLists(input);
-	const sortedLeftList = generateSortedListInAscOrder(leftList);
-	const sortedRightList = generateSortedListInAscOrder(rightList);
-	const result = traverseLists(sortedLeftList, sortedRightList);
-
+function findTotalDistanceBetweenLists(
+	leftList: number[],
+	rightList: number[],
+): Result {
+	const description = "Total distance between the lists";
+	const leftListGenerator = makeListGenerator(leftList);
+	const rightListGenerator = makeListGenerator(rightList);
+	const value = traverseLists(leftListGenerator, rightListGenerator);
 	return {
-		value: result,
-		description: "Total distance between the lists",
+		value,
+		description,
 	};
 }
 
-if (import.meta.main) {
-	const result = main();
-	logModExecution(result, import.meta.dirname);
+function findSimilarityScoreBetweenLists(
+	leftList: number[],
+	rightList: number[],
+): Result {
+	const description = "Similarity score for the lists";
+	const occuranceMap = new Map<number, number>();
+	for (const item of rightList) {
+		occuranceMap.set(item, (occuranceMap.get(item) ?? 0) + 1);
+	}
+	let similarityScore = 0;
+	for (const item of leftList) {
+		const itemScoreInRightList = occuranceMap.get(item);
+		if (itemScoreInRightList) {
+			similarityScore += item * itemScoreInRightList;
+		}
+	}
+	return {
+		description,
+		value: similarityScore,
+	};
 }
