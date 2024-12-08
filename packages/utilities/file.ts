@@ -1,11 +1,12 @@
 import { existsSync } from "@std/fs";
-import { isTypeString, type Maybe } from "./type_utils.ts";
+import { type Maybe, type SupportedFileExtensions } from "../../types.ts";
+import { isTypeString } from "./string.ts";
 
 export function appendFileExt(
 	path: Maybe<string>,
-	ext: ".ts" | ".js" = ".ts",
+	ext: SupportedFileExtensions = ".ts",
 ): Maybe<string> {
-	return path && !path.endsWith(ext) ? `${path}.ts` : path;
+	return path && !path.endsWith(ext) ? `${path}${ext}` : path;
 }
 
 export function getValidFilePathOrThrow(

@@ -1,4 +1,5 @@
-import type { Maybe } from "../type_utils.ts";
+import type { Maybe } from "../../types.ts";
+import { splitInListByNewLine } from "../utilities/string.ts";
 
 const defaultInputFileName = Deno.env.get(
 	"DEFAULT_INPUT_FILE_NAME",
@@ -12,7 +13,7 @@ type Config<ParserFn> = {
 };
 
 function defaultParser(fileText: string): string[] {
-	return fileText.trim().split("\n");
+	return splitInListByNewLine(fileText);
 }
 
 export function getInput<

@@ -1,7 +1,8 @@
 import { type Args, parseArgs } from "@std/cli/parse-args";
-import { isTypeString } from "./packages/type_utils.ts";
-import { logModExecution } from "./packages/logger.ts";
-import { getValidFilePathOrThrow } from "./packages/helpers.ts";
+import { isTypeString } from "./packages/utilities/string.ts";
+import { logModExecution } from "./packages/logger/mod.ts";
+import { getValidFilePathOrThrow } from "./packages/utilities/file.ts";
+import type { SolutionModule } from "./problems/types.ts";
 
 type CliArguments = {
 	day?: number;
@@ -11,7 +12,7 @@ function getModulePathToRunOrThrow(args: Args<CliArguments>): string {
 	if (args.day) {
 		return getValidFilePathOrThrow(
 			{
-				path: `./problems/day-${args}/mod.ts`,
+				path: `./problems/day-${args.day}/mod.ts`,
 				exceptionMsg: "The solution for the provided day do not exist!",
 			},
 		);
@@ -29,7 +30,7 @@ function getModulePathToRunOrThrow(args: Args<CliArguments>): string {
 async function main() {
 	const args: Args<CliArguments> = parseArgs(Deno.args);
 	const modulePath = getModulePathToRunOrThrow(args);
-	const mod = await import(`./${modulePath}`);
+	const mod: SolutionModule = await import(`./${modulePath}`);
 	if (mod.main) {
 		logModExecution(mod.main(), modulePath);
 	} else {

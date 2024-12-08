@@ -3,14 +3,15 @@
  * https://adventofcode.com/2024/day/1
  */
 import { getInput } from "../../packages/input_handler/mod.ts";
-import { logModExecution } from "../../packages/logger.ts";
+import { logModExecution } from "../../packages/logger/mod.ts";
+import { splitInListByWhitespace } from "../../packages/utilities/string.ts";
 import type { Result } from "../types.ts";
 
 function retrieveLists(input: string[]) {
 	const leftList: number[] = [];
 	const rightList: number[] = [];
 	for (const value of input) {
-		const [left, right] = value.trim().split(/\s+/);
+		const [left, right] = splitInListByWhitespace(value);
 		leftList.push(Number(left));
 		rightList.push(Number(right));
 	}
@@ -35,10 +36,11 @@ function traverseLists(
 	if (leftYield.done && rightYield.done) {
 		return totalDistance;
 	}
+
 	return traverseLists(
 		leftList,
 		rightList,
-		totalDistance + Math.abs((rightYield.value ?? 0) - (rightYield.value ?? 0)),
+		totalDistance + Math.abs((leftYield.value ?? 0) - (rightYield.value ?? 0)),
 	);
 }
 
