@@ -1,6 +1,5 @@
 import { existsSync } from "@std/fs";
 import { type Maybe, type SupportedFileExtensions } from "../../types.ts";
-import { isTypeString } from "./string.ts";
 
 export function appendFileExt(
 	path: Maybe<string>,
@@ -10,15 +9,13 @@ export function appendFileExt(
 }
 
 export function getValidFilePathOrThrow(
-	input: Maybe<string | { path: Maybe<string>; exceptionMsg?: string }>,
+	path: Maybe<string>,
+	ext?: SupportedFileExtensions,
 ): string {
-	const path = isTypeString(input) ? input : input?.path;
-	const exception = isTypeString(input) ? null : input?.exceptionMsg;
-
-	const pathWithExt = appendFileExt(path);
+	const pathWithExt = appendFileExt(path, ext);
 
 	if (pathWithExt && existsSync(pathWithExt)) {
 		return pathWithExt;
 	}
-	throw Error(exception ?? "Invalid file path");
+	throw new Error(`Invalid file path: ${path}`);
 }

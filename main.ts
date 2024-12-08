@@ -10,21 +10,20 @@ type CliArguments = {
 
 function getModulePathToRunOrThrow(args: Args<CliArguments>): string {
 	if (args.day) {
-		return getValidFilePathOrThrow(
-			{
-				path: `./problems/day-${args.day}/mod.ts`,
-				exceptionMsg: "The solution for the provided day do not exist!",
-			},
-		);
+		try {
+			return getValidFilePathOrThrow(`./problems/day-${args.day}/mod.ts`);
+		} catch (err) {
+			throw new Error(CLI_ERRORS.unknownDayArg, {
+				cause: err,
+			});
+		}
 	}
 
 	if (args._) {
 		return getValidFilePathOrThrow(args._.find(isTypeString));
 	}
 
-	throw Error(
-		"Pass the argument --day to run that problem or directly pass the mod path",
-	);
+	throw new Error(CLI_ERRORS.missingArgs);
 }
 
 async function main() {
@@ -34,12 +33,19 @@ async function main() {
 	if (mod.main) {
 		logModExecution(mod.main(), modulePath);
 	} else {
-		throw Error(
-			`Unable to determine entry point (main) for module: ${modulePath}`,
-		);
+		throw new Error(CLI_ERRORS.undeterminedEntry, {
+			cause: modulePath,
+		});
 	}
 }
 
 if (import.meta.main) {
 	main();
 }
+
+const CLI_ERRORS = {
+	missingArgs:
+		"Pass the argument --day to run that problem or directly pass the mod path",
+	unknownDayArg: "The solution for the provided day do not exist!",
+	undeterminedEntry: "Unable to determine entry point (main) for module",
+};

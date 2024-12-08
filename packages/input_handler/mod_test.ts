@@ -19,9 +19,7 @@ Deno.test({
 Deno.test({
 	name: "Read input file and parse its content",
 	fn: () => {
-		Deno.env.set("DEFAULT_INPUT_FILE_NAME", "mock_input.txt");
-
-		const actual = getInput(import.meta.dirname);
+		const actual = getInput("fixtures");
 		assertEquals(actual, ["test"]);
 	},
 });
@@ -29,11 +27,14 @@ Deno.test({
 Deno.test({
 	name: "Use custom parser to parse file content when provided",
 	fn: () => {
-		const actual = getInput(import.meta.dirname, {
-			afterRead(input: string) {
-				return input.trim();
+		const actual = getInput(
+			"fixtures",
+			{
+				afterRead(input: string) {
+					return input.trim();
+				},
 			},
-		});
+		);
 		assertEquals(actual, "test");
 	},
 });
