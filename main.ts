@@ -19,7 +19,7 @@ function getModulePathToRunOrThrow(args: CliArguments): string {
 		return getValidFilePathOrThrow(args._.find(isTypeString));
 	}
 
-	throw new Error(CLI_ERRORS.missingArgs);
+	throw new Error(CLI_ERRORS.missingArgs, { cause: args });
 }
 
 async function main() {
