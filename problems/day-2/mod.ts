@@ -15,19 +15,14 @@ import type { Result } from "../types.ts";
  * @returns Array of results for each part or Specific result if param solvePart was specified
  */
 
-const MAX_DAMPNER_TOLERANCE = 1;
 const LEAST_DIFF = 1;
 const MAX_DIFF = 3;
 
 export function main(solvePart?: number): Result | Result[] {
 	const reports: string[] = getInput(import.meta.dirname);
 
-	if (solvePart === 1) {
-		return findSafeReports(reports);
-	}
-
-	if (solvePart === 2) {
-		return findSafeReports(reports, { useDampner: true });
+	if (solvePart) {
+		return findSafeReports(reports, { useDampner: solvePart === 2 });
 	}
 
 	return [
@@ -46,72 +41,50 @@ function findSafeReports(
 	options?: { useDampner: boolean },
 ): Result {
 	let safeCount: number = 0;
-	const dampnerTolerance: number = options?.useDampner
-		? MAX_DAMPNER_TOLERANCE
-		: 0;
+	const checkSafety = options?.useDampner
+		? isReportSafeAfterOneRemoval
+		: isReportSafe;
+
 	for (const report of reports) {
-		const levels = splitInListByWhitespace(report);
-		const isReportSafe: boolean = checkReportSafety(levels, dampnerTolerance);
-		safeCount += Number(isReportSafe);
+		const reportData: number[] = splitInListByWhitespace(report).map(Number);
+		safeCount += Number(checkSafety(reportData));
 	}
+
 	return {
-		description: "Number of safe reports",
+		description: options?.useDampner
+			? "Number of safe reports with single fault dampner"
+			: "Number of safe reports",
 		value: safeCount,
 	};
 }
 
-type DiffDirection = -1 | 1 | 0;
-
-/**
- * @param reportLevels
- * @returns
- */
-function checkReportSafety(
-	reportLevels: string[],
-	canTolerate: number = 0,
-) {
-	if (reportLevels.length < 2) {
-		// Just assuming this case when levels are either only 1 or 0
-		return false;
-	}
-
-	// bit flag to check if levels are supposed to be in increasing or decreasing direction
-	// -1 = increasing
-	// +1 = decreasing
-	// 0 = direction has not been determined
-	let expectedDiffDirection: DiffDirection = 0;
-
-	for (let level = 1; level < reportLevels.length; level++) {
-		const prev = Number(reportLevels[level - 1]);
-		const current = Number(reportLevels[level]);
-		const diff = prev - current;
-		if (!expectedDiffDirection && diff) {
-			// set only when differnece is non-zero and
-			// expectedDiffDirection has not been updated
-			expectedDiffDirection = Math.sign(diff) as DiffDirection;
-		}
-		if (isSafe(diff, expectedDiffDirection)) {
-			continue;
-		} else if (canTolerate) {
-			canTolerate -= 1;
-		} else {
-			return false;
-		}
-	}
-	return true;
+function isReportSafe(report: number[]) {
+	const isInRange = (value: number) => value >= LEAST_DIFF && value <= MAX_DIFF;
+	const isIncreasing = () =>
+		report.every((item, level, list) => {
+			if (level > 0) {
+				return item > list[level - 1] && isInRange(item - list[level - 1]);
+			}
+			return true;
+		});
+	const isDecreasing = () =>
+		report.every((item, level, list) => {
+			if (level > 0) {
+				return item < list[level - 1] && isInRange(list[level - 1] - item);
+			}
+			return true;
+		});
+	return isIncreasing() || isDecreasing();
 }
 
-/**
- * @param diff
- * @param expectedDiffDirection
- * @returns
- */
-function isSafe(diff: number, expectedDiffDirection: DiffDirection) {
-	if (expectedDiffDirection !== Math.sign(diff)) {
-		return false;
+function isReportSafeAfterOneRemoval(report: number[]) {
+	for (let index = 0; index < report.length; index++) {
+		const modifiedReport = report.slice(0, index).concat(
+			report.slice(index + 1),
+		);
+		if (isReportSafe(modifiedReport)) {
+			return true;
+		}
 	}
-	if (Math.abs(diff) < LEAST_DIFF || Math.abs(diff) > MAX_DIFF) {
-		return false;
-	}
-	return true;
+	return false;
 }
