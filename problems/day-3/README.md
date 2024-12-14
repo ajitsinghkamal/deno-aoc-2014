@@ -5,7 +5,7 @@ Run the solution with:
 
 ```bash
 
-deno task main --day=1
+deno task main --day=3
 
 ```
 
